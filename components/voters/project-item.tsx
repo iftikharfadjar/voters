@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import type { Project } from '@/hooks/use-realtime-projects'
 import type { Batch } from '@/hooks/use-realtime-batches'
+import type { VotingGroup } from '@/hooks/use-realtime-voting-groups'
+import type { Option } from '@/hooks/use-realtime-options'
 import { BatchItem } from '@/components/voters/batch-item'
 
 interface ProjectItemProps {
@@ -18,6 +20,12 @@ interface ProjectItemProps {
   onCreateBatch: (data: { project_id: string; name: string; status: string }) => Promise<unknown>
   onUpdateBatch: (id: string, data: { name?: string; status?: string }) => Promise<unknown>
   onDeleteBatch: (id: string) => Promise<void>
+  groupsByBatch: Record<string, VotingGroup[]>
+  optionsByGroup: Record<string, Option[]>
+  castVote: (optionId: string, score: number) => Promise<void>
+  groupsLoading: boolean
+  onCreateVotingGroup: (data: { batch_id: string; name: string; interaction_type: string; max_score: number; require_all_options: boolean }) => Promise<unknown>
+  onCreateOption: (data: { group_id: string; name: string }) => Promise<unknown>
 }
 
 export function ProjectItem({
@@ -28,6 +36,12 @@ export function ProjectItem({
   onCreateBatch,
   onUpdateBatch,
   onDeleteBatch,
+  groupsByBatch,
+  optionsByGroup,
+  castVote,
+  groupsLoading,
+  onCreateVotingGroup,
+  onCreateOption,
 }: ProjectItemProps) {
   const [editingField, setEditingField] = useState<{ field: 'name' | 'status'; value: string } | null>(null)
   const [addingBatch, setAddingBatch] = useState(false)
@@ -164,6 +178,12 @@ export function ProjectItem({
                   batch={batch}
                   onUpdate={onUpdateBatch}
                   onDelete={onDeleteBatch}
+                  groupsByBatch={groupsByBatch}
+                  optionsByGroup={optionsByGroup}
+                  castVote={castVote}
+                  groupsLoading={groupsLoading}
+                  onCreateVotingGroup={onCreateVotingGroup}
+                  onCreateOption={onCreateOption}
                 />
               ))}
             </Accordion>
