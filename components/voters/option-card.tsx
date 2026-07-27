@@ -52,6 +52,7 @@ export function OptionCard({
         <div className="flex gap-3 text-xs text-muted-foreground">
           <span>{option.total_submissions} votes</span>
           <span>Score: {option.total_score}</span>
+          {interactionType === 'RATE' && <span>Avg: {option.total_submissions > 0 ? (option.total_score / option.total_submissions).toFixed(2) : '0.00'}</span>}
         </div>
         {interactionType === 'RATE' && (
           <div className="flex gap-1 pt-1" onClick={(e) => e.stopPropagation()}>

@@ -1,17 +1,20 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import type { Project } from '@/hooks/use-realtime-projects'
 
 interface CreateProjectFormProps {
-  onCreate: (data: { name: string; status: string }) => Promise<unknown>
+  onCreate: (data: Project) => Promise<unknown>
 }
 
 export function CreateProjectForm({ onCreate }: CreateProjectFormProps) {
+  const router = useRouter()
   const [name, setName] = useState('')
   const [status, setStatus] = useState('active')
   const [loading, setLoading] = useState(false)
@@ -22,9 +25,16 @@ export function CreateProjectForm({ onCreate }: CreateProjectFormProps) {
 
     setLoading(true)
     try {
-      await onCreate({ name: name.trim(), status })
-      setName('')
-      setStatus('active')
+      const ts = new Date().toISOString()
+      const project: Project = {
+        id: crypto.randomUUID(),
+        name: name.trim(),
+        status,
+        created_at: ts,
+        updated_at: ts,
+      }
+      await onCreate(project)
+      router.push('/voters/' + project.id)
     } finally {
       setLoading(false)
     }

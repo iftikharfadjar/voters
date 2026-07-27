@@ -64,6 +64,7 @@ export function useRealtimeVotingGroups() {
     async (data: { batch_id: string; name: string; interaction_type: string; max_score: number; require_all_options: boolean }) => {
       if (!channel || !isConnected) return
 
+      const ts = new Date().toISOString()
       const group: VotingGroup = {
         id: crypto.randomUUID(),
         batch_id: data.batch_id,
@@ -71,7 +72,8 @@ export function useRealtimeVotingGroups() {
         interaction_type: data.interaction_type as 'VOTE' | 'RATE',
         max_score: data.max_score,
         require_all_options: data.require_all_options,
-        created_at: new Date().toISOString(),
+        created_at: ts,
+        updated_at: ts,
       }
 
       setGroups((current) => [group, ...current])

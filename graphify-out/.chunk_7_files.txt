@@ -1,0 +1,4 @@
+/mnt/data/Project/voters/.agents/skills/shadcn/assets/shadcn-small.png
+/mnt/data/Project/voters/.agents/skills/shadcn/assets/shadcn.png
+/mnt/data/Project/voters/app/opengraph-image.png
+/mnt/data/Project/voters/app/twitter-image.png

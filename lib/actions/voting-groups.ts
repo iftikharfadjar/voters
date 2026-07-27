@@ -10,6 +10,7 @@ export interface VotingGroup {
   max_score: number
   require_all_options: boolean
   created_at: string
+  updated_at: string
 }
 
 export async function createVotingGroup(data: {
@@ -20,6 +21,7 @@ export async function createVotingGroup(data: {
   max_score: number
   require_all_options: boolean
   created_at: string
+  updated_at: string
 }) {
   const supabase = await createClient()
 
@@ -31,6 +33,7 @@ export async function createVotingGroup(data: {
     max_score: data.max_score,
     require_all_options: data.require_all_options,
     created_at: data.created_at,
+    updated_at: data.updated_at,
   })
 
   if (error) throw new Error(error.message)

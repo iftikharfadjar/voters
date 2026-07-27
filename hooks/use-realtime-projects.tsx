@@ -64,15 +64,8 @@ export function useRealtimeProjects() {
   }, [supabase])
 
   const createProject = useCallback(
-    async (data: { name: string; status: string }) => {
+    async (project: Project) => {
       if (!channel || !isConnected) return
-
-      const project: Project = {
-        id: crypto.randomUUID(),
-        name: data.name,
-        status: data.status,
-        created_at: new Date().toISOString(),
-      }
 
       setProjects((current) => [project, ...current])
 

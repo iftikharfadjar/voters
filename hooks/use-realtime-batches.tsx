@@ -64,12 +64,14 @@ export function useRealtimeBatches() {
     async (data: { project_id: string; name: string; status: string }) => {
       if (!channel || !isConnected) return
 
+      const ts = new Date().toISOString()
       const batch: Batch = {
         id: crypto.randomUUID(),
         project_id: data.project_id,
         name: data.name,
         status: data.status,
-        created_at: new Date().toISOString(),
+        created_at: ts,
+        updated_at: ts,
       }
 
       setBatches((current) => [batch, ...current])

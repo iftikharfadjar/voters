@@ -8,12 +8,16 @@ export interface Option {
   name: string
   total_submissions: number
   total_score: number
+  created_at: string
+  updated_at: string
 }
 
 export async function createOption(data: {
   id: string
   group_id: string
   name: string
+  created_at: string
+  updated_at: string
 }) {
   const supabase = await createClient()
 
@@ -21,6 +25,8 @@ export async function createOption(data: {
     id: data.id,
     group_id: data.group_id,
     name: data.name,
+    created_at: data.created_at,
+    updated_at: data.updated_at,
   })
 
   if (error) throw new Error(error.message)

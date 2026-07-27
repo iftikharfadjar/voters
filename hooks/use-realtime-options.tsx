@@ -65,12 +65,15 @@ export function useRealtimeOptions(sessionId: string) {
     async (data: { group_id: string; name: string }) => {
       if (!channel || !isConnected) return
 
+      const ts = new Date().toISOString()
       const option: Option = {
         id: crypto.randomUUID(),
         group_id: data.group_id,
         name: data.name,
         total_submissions: 0,
         total_score: 0,
+        created_at: ts,
+        updated_at: ts,
       }
 
       setOptions((current) => [option, ...current])
@@ -81,7 +84,7 @@ export function useRealtimeOptions(sessionId: string) {
         payload: option,
       })
 
-      void createOptionAction({ id: option.id, group_id: option.group_id, name: option.name })
+      void createOptionAction({ id: option.id, group_id: option.group_id, name: option.name, created_at: ts, updated_at: ts })
     },
     [channel, isConnected],
   )

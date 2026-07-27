@@ -126,43 +126,56 @@ export function BatchItem({ batch, onUpdate, onDelete, groupsByBatch, optionsByG
 
           {addingGroup && (
             <div className="space-y-3 rounded-md border p-3">
-              <div className="space-y-1">
-                <Label className="text-xs font-medium">Group name</Label>
-                <Input
-                  value={newGroupName}
-                  onChange={(e) => setNewGroupName(e.target.value)}
-                  placeholder="Group name"
-                  disabled={groupLoading}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-end gap-2">
+                <div className="flex-1 space-y-1">
+                  <Label className="text-xs font-medium">Group name</Label>
+                  <Input
+                    value={newGroupName}
+                    onChange={(e) => setNewGroupName(e.target.value)}
+                    placeholder="Group name"
+                    disabled={groupLoading}
+                    className="h-8 text-sm"
+                  />
+                </div>
                 <div className="space-y-1">
                   <Label className="text-xs font-medium">Type</Label>
-                  <select
-                    value={newGroupType}
-                    onChange={(e) => setNewGroupType(e.target.value as 'VOTE' | 'RATE')}
-                    disabled={groupLoading}
-                    className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm"
-                  >
-                    <option value="VOTE">VOTE</option>
-                    <option value="RATE">RATE</option>
-                  </select>
-                </div>
-                {newGroupType === 'RATE' && (
-                  <div className="space-y-1">
-                    <Label className="text-xs font-medium">Max score</Label>
-                    <Input
-                      type="number"
-                      min={1}
-                      value={newGroupMaxScore}
-                      onChange={(e) => setNewGroupMaxScore(Number(e.target.value))}
+                  <div className="flex gap-1">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={newGroupType === 'VOTE' ? 'default' : 'outline'}
+                      onClick={() => setNewGroupType('VOTE')}
                       disabled={groupLoading}
-                      className="h-8 text-sm"
-                    />
+                      className={newGroupType === 'VOTE' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'hover:text-blue-600 hover:border-blue-600'}
+                    >
+                      VOTE
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={newGroupType === 'RATE' ? 'default' : 'outline'}
+                      onClick={() => setNewGroupType('RATE')}
+                      disabled={groupLoading}
+                      className={newGroupType === 'RATE' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'hover:text-blue-600 hover:border-blue-600'}
+                    >
+                      RATE
+                    </Button>
                   </div>
-                )}
+                </div>
               </div>
+              {newGroupType === 'RATE' && (
+                <div className="space-y-1">
+                  <Label className="text-xs font-medium">Max score</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={newGroupMaxScore}
+                    onChange={(e) => setNewGroupMaxScore(Number(e.target.value))}
+                    disabled={groupLoading}
+                    className="h-8 text-sm"
+                  />
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="require-all"

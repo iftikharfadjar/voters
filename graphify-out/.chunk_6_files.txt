@@ -1,0 +1,6 @@
+/mnt/data/Project/voters/.agents/skills/vercel-react-best-practices/rules/server-no-shared-module-state.md
+/mnt/data/Project/voters/.agents/skills/vercel-react-best-practices/rules/server-parallel-fetching.md
+/mnt/data/Project/voters/.agents/skills/vercel-react-best-practices/rules/server-parallel-nested-fetching.md
+/mnt/data/Project/voters/.agents/skills/vercel-react-best-practices/rules/server-serialization.md
+/mnt/data/Project/voters/hooks/AGENTS.md
+/mnt/data/Project/voters/lib/actions/AGENTS.md

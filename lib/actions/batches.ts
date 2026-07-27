@@ -8,6 +8,7 @@ export interface Batch {
   name: string;
   status: string;
   created_at: string;
+  updated_at: string;
 }
 
 export async function createBatch(data: {
@@ -16,6 +17,7 @@ export async function createBatch(data: {
   name: string
   status: string
   created_at: string
+  updated_at: string
 }) {
   const supabase = await createClient()
 
@@ -25,6 +27,7 @@ export async function createBatch(data: {
     name: data.name,
     status: data.status,
     created_at: data.created_at,
+    updated_at: data.updated_at,
   })
 
   if (error) throw new Error(error.message)

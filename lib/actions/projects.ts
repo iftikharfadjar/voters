@@ -7,9 +7,10 @@ export interface Project {
   name: string
   status: string
   created_at: string
+  updated_at: string
 }
 
-export async function createProject(data: { id: string; name: string; status: string; created_at: string }) {
+export async function createProject(data: { id: string; name: string; status: string; created_at: string; updated_at: string }) {
   const supabase = await createClient()
 
   const { error } = await supabase.from('voters_projects').insert({
@@ -17,6 +18,7 @@ export async function createProject(data: { id: string; name: string; status: st
     name: data.name,
     status: data.status,
     created_at: data.created_at,
+    updated_at: data.updated_at,
   })
 
   if (error) throw new Error(error.message)
