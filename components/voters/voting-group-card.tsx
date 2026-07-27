@@ -3,7 +3,6 @@
 import { useCallback, useState } from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { OptionCard } from '@/components/voters/option-card'
@@ -63,23 +62,21 @@ export function VotingGroupCard({ group, options, isLoading, castVote, onCreateO
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between p-4 pb-2">
+      <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
         <div className="space-y-0.5">
           <CardTitle className="text-sm">{group.name}</CardTitle>
-          <div className="flex gap-2 text-xs text-muted-foreground">
-            <Badge variant="outline" className="text-xs">
-              {group.interaction_type}
-            </Badge>
-            {group.interaction_type === 'RATE' && <span>Max score: {group.max_score}</span>}
-          </div>
+          {group.interaction_type === 'RATE' && <p className="text-xs text-muted-foreground">Max score: {group.max_score}</p>}
         </div>
+        <Button variant="outline" size="sm" onClick={() => setAddingOption((v) => !v)}>
+          {addingOption ? 'Cancel' : 'Add Option'}
+        </Button>
       </CardHeader>
       <CardContent className="p-4 pt-2 space-y-2">
         {isLoading && <p className="text-xs text-muted-foreground">Loading options...</p>}
         {!isLoading && options.length === 0 && !addingOption && (
           <p className="text-xs text-muted-foreground">No options yet.</p>
         )}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-col gap-2">
           {options.map((option) => (
             <OptionCard
               key={option.id}
@@ -115,23 +112,18 @@ export function VotingGroupCard({ group, options, isLoading, castVote, onCreateO
           </div>
         )}
 
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setAddingOption((v) => !v)}>
-            {addingOption ? 'Cancel' : 'Add Option'}
-          </Button>
-          <Button
-            className="flex-1"
-            size="sm"
-            disabled={!hasSelectedAny || submitting}
-            onClick={handleSubmit}
-          >
-            {submitting
-              ? 'Submitting...'
-              : group.interaction_type === 'VOTE'
-                ? 'Submit Vote'
-                : 'Submit Ratings'}
-          </Button>
-        </div>
+        <Button
+          size="sm"
+          disabled={!hasSelectedAny || submitting}
+          onClick={handleSubmit}
+          className="w-full"
+        >
+          {submitting
+            ? 'Submitting...'
+            : group.interaction_type === 'VOTE'
+              ? 'Submit Vote'
+              : 'Submit Ratings'}
+        </Button>
       </CardContent>
     </Card>
   )
