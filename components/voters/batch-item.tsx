@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
@@ -24,7 +24,7 @@ interface BatchItemProps {
   onCreateOption: (data: { group_id: string; name: string }) => Promise<unknown>
 }
 
-export function BatchItem({ batch, onUpdate, onDelete, groupsByBatch, optionsByGroup, castVote,   groupsLoading, onCreateVotingGroup, onCreateOption }: BatchItemProps) {
+export function BatchItem({ batch, onUpdate, onDelete, groupsByBatch, optionsByGroup, castVote, groupsLoading, onCreateVotingGroup, onCreateOption }: BatchItemProps) {
   const [editingField, setEditingField] = useState<{ field: 'name' | 'status'; value: string } | null>(null)
   const [addingGroup, setAddingGroup] = useState(false)
   const [newGroupName, setNewGroupName] = useState('')
@@ -32,8 +32,27 @@ export function BatchItem({ batch, onUpdate, onDelete, groupsByBatch, optionsByG
   const [newGroupMaxScore, setNewGroupMaxScore] = useState(5)
   const [newGroupRequireAll, setNewGroupRequireAll] = useState(false)
   const [groupLoading, setGroupLoading] = useState(false)
+  const [groupSelections, setGroupSelections] = useState<Record<string, { selectedOptionId: string | null; optionScores: Record<string, number> }>>({})
+  const [submitting, setSubmitting] = useState(false)
 
   const groups = groupsByBatch[batch.id] ?? []
+
+  const handleSelect = useCallback((groupId: string) => (optionId: string) => {
+    setGroupSelections((prev) => ({
+      ...prev,
+      [groupId]: { ...prev[groupId], selectedOptionId: optionId },
+    }))
+  }, [])
+
+  const handleScoreChange = useCallback((groupId: string) => (optionId: string, score: number) => {
+    setGroupSelections((prev) => ({
+      ...prev,
+      [groupId]: {
+        ...prev[groupId],
+        optionScores: { ...(prev[groupId]?.optionScores ?? {}), [optionId]: score },
+      },
+    }))
+  }, [])
 
   function startEdit(field: 'name' | 'status') {
     setEditingField({ field, value: batch[field] })
@@ -65,6 +84,32 @@ export function BatchItem({ batch, onUpdate, onDelete, groupsByBatch, optionsByG
       setGroupLoading(false)
     }
   }
+
+  async function handleSubmitAll() {
+    setSubmitting(true)
+    try {
+      for (const group of groups) {
+        const sel = groupSelections[group.id]
+        if (!sel) continue
+        if (group.interaction_type === 'VOTE' && sel.selectedOptionId) {
+          await castVote(sel.selectedOptionId, 1)
+        } else if (group.interaction_type === 'RATE') {
+          for (const [optionId, score] of Object.entries(sel.optionScores)) {
+            await castVote(optionId, score)
+          }
+        }
+      }
+      setGroupSelections({})
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const hasAnySelection = groups.some((g) => {
+    const sel = groupSelections[g.id]
+    if (!sel) return false
+    return g.interaction_type === 'VOTE' ? sel.selectedOptionId !== null : Object.keys(sel.optionScores).length > 0
+  })
 
   return (
     <AccordionItem value={batch.id} className="border-0">
@@ -208,11 +253,21 @@ export function BatchItem({ batch, onUpdate, onDelete, groupsByBatch, optionsByG
                     group={group}
                     options={optionsByGroup[group.id] ?? []}
                     isLoading={groupsLoading}
-                    castVote={castVote}
                     onCreateOption={onCreateOption}
+                    selectedOptionId={groupSelections[group.id]?.selectedOptionId ?? null}
+                    selectedScores={groupSelections[group.id]?.optionScores ?? {}}
+                    onSelect={handleSelect(group.id)}
+                    onScoreChange={handleScoreChange(group.id)}
                   />
                 ))}
               </div>
+              <Button
+                size="sm"
+                disabled={!hasAnySelection || submitting}
+                onClick={handleSubmitAll}
+              >
+                {submitting ? 'Submitting...' : 'Submit'}
+              </Button>
             </div>
           )}
         </div>

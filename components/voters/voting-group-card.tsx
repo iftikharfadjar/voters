@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -13,40 +13,17 @@ interface VotingGroupCardProps {
   group: VotingGroup
   options: Option[]
   isLoading: boolean
-  castVote: (optionId: string, score: number) => Promise<void>
   onCreateOption: (data: { group_id: string; name: string }) => Promise<unknown>
+  selectedOptionId: string | null
+  selectedScores: Record<string, number>
+  onSelect: (optionId: string) => void
+  onScoreChange: (optionId: string, score: number) => void
 }
 
-export function VotingGroupCard({ group, options, isLoading, castVote, onCreateOption }: VotingGroupCardProps) {
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null)
-  const [optionScores, setOptionScores] = useState<Record<string, number>>({})
-  const [submitting, setSubmitting] = useState(false)
+export function VotingGroupCard({ group, options, isLoading, onCreateOption, selectedOptionId, selectedScores, onSelect, onScoreChange }: VotingGroupCardProps) {
   const [addingOption, setAddingOption] = useState(false)
   const [newOptionName, setNewOptionName] = useState('')
   const [optionLoading, setOptionLoading] = useState(false)
-
-  const hasSelectedAny = group.interaction_type === 'VOTE' ? selectedOptionId !== null : Object.keys(optionScores).length > 0
-
-  const handleScoreChange = useCallback((optionId: string, score: number) => {
-    setOptionScores((prev) => ({ ...prev, [optionId]: score }))
-  }, [])
-
-  const handleSubmit = useCallback(async () => {
-    setSubmitting(true)
-    try {
-      if (group.interaction_type === 'VOTE' && selectedOptionId) {
-        await castVote(selectedOptionId, 1)
-        setSelectedOptionId(null)
-      } else if (group.interaction_type === 'RATE') {
-        for (const [optionId, score] of Object.entries(optionScores)) {
-          await castVote(optionId, score)
-        }
-        setOptionScores({})
-      }
-    } finally {
-      setSubmitting(false)
-    }
-  }, [group.interaction_type, selectedOptionId, optionScores, castVote])
 
   async function handleAddOption() {
     if (!newOptionName.trim()) return
@@ -84,9 +61,9 @@ export function VotingGroupCard({ group, options, isLoading, castVote, onCreateO
               interactionType={group.interaction_type}
               maxScore={group.max_score}
               selected={selectedOptionId === option.id}
-              selectedScore={optionScores[option.id] ?? null}
-              onSelect={setSelectedOptionId}
-              onScoreChange={handleScoreChange}
+              selectedScore={selectedScores[option.id] ?? null}
+              onSelect={onSelect}
+              onScoreChange={onScoreChange}
             />
           ))}
         </div>
@@ -111,19 +88,6 @@ export function VotingGroupCard({ group, options, isLoading, castVote, onCreateO
             </Button>
           </div>
         )}
-
-        <Button
-          size="sm"
-          disabled={!hasSelectedAny || submitting}
-          onClick={handleSubmit}
-          className="w-full"
-        >
-          {submitting
-            ? 'Submitting...'
-            : group.interaction_type === 'VOTE'
-              ? 'Submit Vote'
-              : 'Submit Ratings'}
-        </Button>
       </CardContent>
     </Card>
   )
